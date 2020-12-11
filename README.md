@@ -23,7 +23,7 @@ Arguments:
   --only_start -- if you only want to start a job
   --only_monitor -- if you only want to monitor an already started a job
   --only_download -- if you only want to download an already finished job
-  --since -- if you only want data after a certain date specify this parameter.
+  --since -- if you only want to pull claims data added after a certain date.
             The expected format is yyyy-MM-dd'T'HH:mm:ss.SSSXXX+/-ZZ:ZZ.
             Example March 1, 2020 at 3 PM EST -> 2020-03-01T15:00:00.000-05:00. More below.
 ```
@@ -34,7 +34,8 @@ Run `python job-cli.py --help` to get a full list of arguments and explanations.
 
 ### Since Parameter
 
-If you only want data after a certain date use the `--since` parameter. The expected format follows the typical
+If you only want to pull claims data added to the CMS system after a certain date use the `--since` parameter.
+The expected format follows the typical
 ISO date time format of `yyyy-MM-dd'T'HH:mm:ss.SSSXXX+/-ZZ:ZZ`.
 
 The earliest date that since works for is February 13th, 2020. Specifically: `2020-02-13T00:00:00.000-05:00`
