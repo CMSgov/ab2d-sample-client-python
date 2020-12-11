@@ -30,7 +30,7 @@ Arguments:
 
 ### Help
 
-Run `python job-cli.py --help` to get a 
+Run `python job-cli.py --help` to get a full list of arguments and explanations.
 
 ### Since Parameter
 
