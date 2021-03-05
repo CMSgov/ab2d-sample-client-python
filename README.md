@@ -10,6 +10,11 @@ Use of these clients in the sandbox environment, can allow for testing, and if a
 
 These clients are provided as examples, but they are fully functioning (with some modifications) in the production environment. Feel free to use them as a reference. When used in production (even for testing purposes), these clients have the ability to download PII/PHI information. You should therefore ensure the environment in which these scripts are run is secured in a way to allow for storage of PII/PHI. Additionally, when used in the production environment the scripts will require use of your production credentials. As such, please ensure that your credentials are handled in a secure manner and not printed to logs or the terminal. Ensuring the privacy of data is the responsibility of each user and/or organization.
 
+## Prerequisites
+
+Python `requests` module must be installed
+
+`python3 -m pip install requests`
 
 ## Python Client
 
@@ -21,24 +26,25 @@ This script will not overwrite already existing export files.
 
 ```
 Usage: 
-  python job-cli.py (-prod | -sandbox) --auth <base64 username:password> [--contract <contract number>] [--directory <dir>] [--since <since>]
+  python job-cli.py (-prod | -sandbox) --auth <base64 username:password> [--contract <contract number>] [--directory <dir>] [--since <since>] [--fhir (STU3 | R4)]
         [(--only_start|--only_monitor|--only_download)]
 
 Help (for an explanation of the arguments): 
    python job-cli.py --help
    
 Arguments:
-  -sandbox -- if running against ab2d sandbox environment
-  -prod -- if running against ab2d production environment
-  --auth -- path to base64 file containing auth token
-  --contract -- if searching specific contract then give contract number ex. Z0001
-  --directory -- if you want files and job info saved to specific directory
-  --only_start -- if you only want to start a job
-  --only_monitor -- if you only want to monitor an already started a job
+  -sandbox        -- if running against ab2d sandbox environment
+  -prod           -- if running against ab2d production environment
+  --auth          -- path to base64 file containing auth token
+  --contract      -- if searching specific contract then give contract number ex. Z0001
+  --directory     -- if you want files and job info saved to specific directory
+  --only_start    -- if you only want to start a job
+  --only_monitor  -- if you only want to monitor an already started a job
   --only_download -- if you only want to download an already finished job
-  --since -- if you only want to pull claims data added after a certain date.
-            The expected format is yyyy-MM-dd'T'HH:mm:ss.SSSXXX+/-ZZ:ZZ.
-            Example March 1, 2020 at 3 PM EST -> 2020-03-01T15:00:00.000-05:00. More below.
+  --since         -- if you only want to pull claims data added after a certain date.
+                     The expected format is yyyy-MM-dd'T'HH:mm:ss.SSSXXX+/-ZZ:ZZ.
+                     Example March 1, 2020 at 3 PM EST -> 2020-03-01T15:00:00.000-05:00. More below.
+  --fhir          -- if you want to specify the FHIR version (STU3 is the default)
 ```
 
 ### Help
