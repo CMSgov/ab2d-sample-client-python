@@ -261,12 +261,16 @@ def get_env(args):
     if not args.prod and not args.sandbox:
         raise ValueError("must provide -prod or -sandbox as an argument")
 
+    version_url = "v1"
+    if args.fhir == "R4":
+        version_url = "v2"
+
     if args.sandbox:
         return ("https://test.idp.idm.cms.gov/oauth2/aus2r7y3gdaFMKBol297/v1/token",
-                "https://sandbox.ab2d.cms.gov/api/v1/fhir")
+                "https://sandbox.ab2d.cms.gov/api/" + version_url + "/fhir")
     else:
         return ("https://idm.cms.gov/oauth2/aus2ytanytjdaF9cr297/v1/token",
-                "https://api.ab2d.cms.gov/api/v1/fhir")
+                "https://api.ab2d.cms.gov/api/" + version_url + "/fhir")
 
 
 def resolve_auth(args):
@@ -320,7 +324,7 @@ parser.add_argument("--only_monitor", action="store_true", help="only monitor an
                                                                 "do not start or download")
 parser.add_argument("--only_download", action="store_true", help="only download results from an already finished job"
                                                                  "do not start or monitor")
-
+parser.add_argument("--fhir", help="choose FHIR version (STU3 or R4)")
 args = parser.parse_args()
 
 try:
