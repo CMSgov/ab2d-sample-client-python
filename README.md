@@ -2,9 +2,13 @@
 
 Our API Clients are open source. This repo contains *sample* Python script which demonstrate how to pull data from the AB2D API Production environment.
 
-This may be a great starting point for your engineering or development teams however it is important to note that the AB2D team does **not** regularly maintain the sample clients. Additionally, a best-effort was made to ensure the clients are secure but they have **not** undergone comprehensive formal security testing. Each user/organization is responsible for conducting their own review and testing prior to implementation
+This may be a great starting point for your engineering or development teams however it is important to note that the AB2D team does **not** regularly maintain the sample clients. Additionally, a best-effort was made to ensure the clients are secure, but they have **not** undergone comprehensive formal security testing. Each user/organization is responsible for conducting their own review and testing prior to implementation
 
-Use of these clients in the sandbox environment, can allow for testing, and if a mistake is made no PII/PHI is compromised. The sandbox environment is publicly available and all of the data in it is synthetic (**not** real)
+Use of these clients in the sandbox environment allows for safe testing and ensures no PII/PHI will not be compromised 
+if a mistake is made. The sandbox environment is publicly available and all the data in it is synthetic (**not** real)
+
+AB2D supports both R4 and STU3 versions of the FHIR standard. FHIR R4 is available using v2 of AB2D while FHIR STU3 
+can be accessed via AB2D v1. Accordingly, this client supports both R4/ v2 and STU3/ v1.
 
 ## Production Use Disclaimer:
 
@@ -20,13 +24,14 @@ Python `requests` module must be installed
 
 A simple client for starting a job in sandbox or production, monitor that job,
 and download the results. To prevent issues these scripts persist the job
-id and list of files generated.
+id and list of files generated. This client supports both FHIR version R4 (v2) and STU3 (v1) of 
+the standard.
 
 This script will not overwrite already existing export files.
 
 ```
 Usage: 
-  python job-cli.py (-prod | -sandbox) --auth <base64 username:password> [--contract <contract number>] [--directory <dir>] [--since <since>] [--fhir (STU3 | R4)]
+  python job-cli.py (-prod | -sandbox) --auth <authfile.base64> [--directory <dir>] [--since <since>] --fhir (R4 | STU3)
         [(--only_start|--only_monitor|--only_download)]
 
 Help (for an explanation of the arguments): 
@@ -36,7 +41,6 @@ Arguments:
   -sandbox        -- if running against ab2d sandbox environment
   -prod           -- if running against ab2d production environment
   --auth          -- path to base64 file containing auth token
-  --contract      -- if searching specific contract then give contract number ex. Z0001
   --directory     -- if you want files and job info saved to specific directory
   --only_start    -- if you only want to start a job
   --only_monitor  -- if you only want to monitor an already started a job
@@ -44,7 +48,7 @@ Arguments:
   --since         -- if you only want to pull claims data added after a certain date.
                      The expected format is yyyy-MM-dd'T'HH:mm:ss.SSSXXX+/-ZZ:ZZ.
                      Example March 1, 2020 at 3 PM EST -> 2020-03-01T15:00:00.000-05:00. More below.
-  --fhir          -- if you want to specify the FHIR version (STU3 is the default)
+  --fhir          -- FHIR version
 ```
 
 ### Help
@@ -57,7 +61,10 @@ If you only want to pull claims data added to the CMS system after a certain dat
 The expected format follows the typical
 ISO date time format of `yyyy-MM-dd'T'HH:mm:ss.SSSXXX+/-ZZ:ZZ`.
 
-The earliest date that since works for is February 13th, 2020. Specifically: `2020-02-13T00:00:00.000-05:00`
+The earliest date that `_since` works for is February 13th, 2020. Specifically: `2020-02-13T00:00:00.000-05:00`
+
+For requests using FHIR R4, a default `_since` value is supplied if one is not provided. The value of the default `_since` 
+parameter is set to the creation date and time of a contract's last successfully searched and downloaded job.
 
 Examples:
 1. March 1, 2020 at 3 PM EST -> `2020-03-01T15:00:00.000-05:00`
@@ -79,11 +86,10 @@ Examples:
 If you want to:
 1. Start a job running against production
 1. Using base64 encoded credentials stored in `auth-credentials.base64`
-1. Pull a specific contract named 'ABCDE'
 1. And save all results for this job to the directory /opt/foo
 
 Then run the following command: 
-`python job-cli.py -production --auth auth-credentials.base64 --contract ABCDE --directory /opt/foo`
+`python job-cli.py -prod --auth auth-credentials.base64 --directory /opt/foo`
 
 ## Install or verify python 3, pip, and required pip modules
 
@@ -129,13 +135,13 @@ Then run the following command:
 
    - if you only see one line of output displaying "python3.exe" under the "WindowsApps" directory, this means python3 is NOT installed
 
-   - these instructions will install from the official python site instead of the Windows Store (which if often locked by administrators)
+   - these instructions will install from the official python site instead of the Windows Store (which is often locked by administrators)
 
 1. If you only had one line of "...\WindowsApps\python3.exe" output, jump to the following section:
 
    [Install python 3 on Windows](#install-python-3-on-windows)
 
-1. If more that one line was displayed in the output and includes a "...\Python\Python3{version}\python.exe" line, jump to the following section:
+1. If more than one line was displayed in the output and includes a "...\Python\Python3{version}\python.exe" line, jump to the following section:
 
    [Verify python and pip work from the command prompt on Windows](#verify-python-and-pip-work-from-the-command-prompt-on-windows)
 
@@ -199,7 +205,7 @@ Then run the following command:
 
 #### Verify python and pip work from the command prompt on Windows
 
-1. Select the the Windows icon (likely in the bottom left of your window)
+1. Select the Windows icon (likely in the bottom left of your window)
 
 1. Type the following in the search text box
 
@@ -341,13 +347,13 @@ Then run the following command:
    *On Mac or Linux:*
 
    ```bash
-   python job-cli.py -sandbox --auth $AUTH_FILE --directory $TARGET_DIR --only_start
+   python job-cli.py -sandbox --auth $AUTH_FILE --directory $TARGET_DIR --only_start --fhir R4
    ```
 
    *On Windows from command prompt:*
 
    ```ShellSession
-   python job-cli.py -sandbox --auth %AUTH_FILE% --directory %TARGET_DIR% --only_start
+   python job-cli.py -sandbox --auth %AUTH_FILE% --directory %TARGET_DIR% --only_start --fhir R4
    ```
 
 1. Verify that a job id was created
@@ -475,13 +481,13 @@ Then run the following command:
    *On Mac or Linux:*
 
    ```bash
-   python job-cli.py -sandbox --auth $AUTH_FILE --directory $TARGET_DIR
+   python job-cli.py -sandbox --auth $AUTH_FILE --directory $TARGET_DIR --fhir R4
    ```
 
    *On Windows from command prompt:*
 
    ```ShellSession
-   python job-cli.py -sandbox --auth %AUTH_FILE% --directory %TARGET_DIR%
+   python job-cli.py -sandbox --auth %AUTH_FILE% --directory %TARGET_DIR% --fhir R4
    ```
 
 1. List the files that you have downloaded
