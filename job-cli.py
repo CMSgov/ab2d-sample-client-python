@@ -5,10 +5,8 @@ import re
 import requests
 import time
 
-
 class ApiError(Exception):
     pass
-
 
 class Action:
     EXPIRATION_BUFFER=90
@@ -72,23 +70,18 @@ class Action:
 
 class StartJob(Action):
 
-    def __init__(self, idp_url, api_url, auth, job_id_file, contract=None, since=None):
+    def __init__(self, idp_url, api_url, auth, job_id_file, since=None):
         """
         Start a job in the
         :param job_id_file: location to read job id from
         :type job_id_file: file
-        :param contract: the contract
         """
         super().__init__(idp_url, api_url, auth)
         self.job_id_file = job_id_file
-        self.contract = contract
         self.since = since
 
     def start_url(self):
-        if self.contract:
-            return "%s/Group/%s/$export" % (self.api_url, self.contract)
-        else:
-            return "%s/Patient/$export" % self.api_url
+        return "%s/Patient/$export" % self.api_url
 
     def __call__(self, *args, **kwargs):
 
@@ -261,9 +254,12 @@ def get_env(args):
     if not args.prod and not args.sandbox:
         raise ValueError("must provide -prod or -sandbox as an argument")
 
-    version_url = "v1"
-    if args.fhir == "R4":
-        version_url = "v2"
+    if args.fhir != 'STU3' and args.fhir != 'R4':
+        raise ValueError("must provide --fhir [R4 | STU3] as an argument")
+
+    version_url = "v2"
+    if args.fhir == "STU3":
+        version_url = "v1"
 
     if args.sandbox:
         return ("https://test.idp.idm.cms.gov/oauth2/aus2r7y3gdaFMKBol297/v1/token",
@@ -310,7 +306,6 @@ def resolve_auth(args):
 parser = argparse.ArgumentParser()
 parser.add_argument("-prod", action="store_true", help="run a job against the AB2D production environment")
 parser.add_argument("-sandbox", action="store_true", help="run a job against the AB2D sandbox environment")
-parser.add_argument("--contract", default=None, help="pull data for a specific contract")
 parser.add_argument("--directory", default="." + os.sep,
                     help="set the directory to save results to, defaults to current directory")
 parser.add_argument("--since", help="receive all EOBs updated or filed after the provided date string."
@@ -324,7 +319,7 @@ parser.add_argument("--only_monitor", action="store_true", help="only monitor an
                                                                 "do not start or download")
 parser.add_argument("--only_download", action="store_true", help="only download results from an already finished job"
                                                                  "do not start or monitor")
-parser.add_argument("--fhir", help="choose FHIR version (STU3 or R4)")
+parser.add_argument("--fhir", required=True, help="choose FHIR version (R4 or STU3)")
 args = parser.parse_args()
 
 try:
@@ -340,13 +335,13 @@ try:
 
     tasks = list()
     if args.only_start:
-        tasks.append(StartJob(idp_url, api_url, auth, job_id_path, args.contract, args.since))
+        tasks.append(StartJob(idp_url, api_url, auth, job_id_path, args.since))
     elif args.only_monitor:
         tasks.append(MonitorJob(idp_url, api_url, auth, job_id_path, completion_id_path))
     elif args.only_download:
         tasks.append(DownloadResults(idp_url, api_url, auth, args.directory, completion_id_path))
     else:
-        tasks.append(StartJob(idp_url, api_url, auth, job_id_path, args.contract, args.since))
+        tasks.append(StartJob(idp_url, api_url, auth, job_id_path, args.since))
         tasks.append(MonitorJob(idp_url, api_url, auth, job_id_path, completion_id_path))
         tasks.append(DownloadResults(idp_url, api_url, auth, args.directory, completion_id_path))
 
