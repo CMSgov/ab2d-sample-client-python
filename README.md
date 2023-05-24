@@ -42,6 +42,7 @@ Arguments:
   -prod           -- if running against ab2d production environment
   --auth          -- path to base64 file containing auth token
   --directory     -- if you want files and job info saved to specific directory
+  --get_token     -- if you only want to get bearer token
   --only_start    -- if you only want to start a job
   --only_monitor  -- if you only want to monitor an already started a job
   --only_download -- if you only want to download an already finished job

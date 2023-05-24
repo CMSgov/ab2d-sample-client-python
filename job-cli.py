@@ -43,11 +43,14 @@ class Action:
             "Authorization": basic_auth
         })
 
+        print('Response status token %s' % response.status_code)
+
         if response.status_code != 200:
             raise ApiError("Could not retrieve bearer token from %s. Response %d. Message %s"
                            % (full_url, response.status_code, response.read()))
 
         self.token = response.json()
+
         return self.token
 
     def get_or_refresh_token(self):
@@ -66,6 +69,17 @@ class Action:
         for header in response.headers.items():
             print('%s: %s' % header)
         print()
+
+
+class GetToken(Action):
+
+    def __init__(self, idp_url, api_url, auth):
+        super().__init__(idp_url, api_url, auth)
+
+
+    def __call__(self, *args, **kwargs):
+        print('Token: %s' % self.retrieve_token())
+
 
 
 class StartJob(Action):
@@ -314,6 +328,7 @@ parser.add_argument("--since", help="receive all EOBs updated or filed after the
                         "see https://docs.oracle.com/en/java/javase/13/docs/api/java.base/java/time/OffsetDateTime.html"
                         " for the expected format.")
 parser.add_argument("--auth", required=True, help="base64 encoding of okta client id and okta client secret")
+parser.add_argument("--get_token", action="store_true", help="only get a bearer token")
 parser.add_argument("--only_start", action="store_true", help="only start a job don't monitor it")
 parser.add_argument("--only_monitor", action="store_true", help="only monitor an already started job"
                                                                 "do not start or download")
@@ -334,7 +349,9 @@ try:
     # since = resolve_since(args)
 
     tasks = list()
-    if args.only_start:
+    if args.get_token:
+        tasks.append(GetToken(idp_url, api_url, auth))
+    elif args.only_start:
         tasks.append(StartJob(idp_url, api_url, auth, job_id_path, args.since))
     elif args.only_monitor:
         tasks.append(MonitorJob(idp_url, api_url, auth, job_id_path, completion_id_path))
