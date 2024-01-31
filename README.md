@@ -31,7 +31,7 @@ This script will not overwrite already existing export files.
 
 ```
 Usage: 
-  python job-cli.py (-prod | -sandbox) --auth <authfile.base64> [--directory <dir>] [--since <since>] --fhir (R4 | STU3)
+  python3 job-cli.py (-prod | -sandbox) --auth <authfile.base64> [--directory <dir>] [--since <since>] --fhir (R4 | STU3)
         [(--only_start|--only_monitor|--only_download)]
 
 Help (for an explanation of the arguments): 
@@ -54,7 +54,7 @@ Arguments:
 
 ### Help
 
-Run `python job-cli.py --help` to get a full list of arguments and explanations.
+Run `python3 job-cli.py --help` to get a full list of arguments and explanations.
 
 ### Since Parameter
 
@@ -90,7 +90,7 @@ If you want to:
 1. And save all results for this job to the directory /opt/foo
 
 Then run the following command: 
-`python job-cli.py -prod --auth auth-credentials.base64 --directory /opt/foo`
+`python3 job-cli.py -prod --auth auth-credentials.base64 --directory /opt/foo`
 
 ## Install or verify python 3, pip, and required pip modules
 
@@ -225,7 +225,7 @@ pip3 --version
    1. Check the python3 version
 
       ```ShellSession
-      python --version
+      python3 --version
       ```
 
    1. Verify that the version of python that you installed is displayed
@@ -239,7 +239,7 @@ pip3 --version
    1. Check the python3 version
 
       ```ShellSession
-      pip --version
+      pip3 --version
       ```
 
    1. Verify that the version of python that you installed is displayed
@@ -247,7 +247,7 @@ pip3 --version
       *Format:*
 
       ```
-      pip {version} from {installation directory}\pip (python 3.{version}
+      pip3 {version} from {installation directory}\pip (python 3.{version}
       ```
 
 #### Install required pip modules on Windows
@@ -255,7 +255,7 @@ pip3 --version
 1. Install the "requests" pip module
 
    ```ShellSession
-   pip install requests
+   pip3 install requests
    ```
 
 1. Verify that the requests module installed correctly
@@ -263,7 +263,7 @@ pip3 --version
    1. Show the request pip module
 
       ```ShellSession
-      pip show requests
+      pip3 show requests
       ```
 
    1. Verify that a description of the "requests" module is displayed
@@ -282,6 +282,10 @@ pip3 --version
 
    [Running All Stages](#running-all-stages)
 
+### Authorization Files
+
+This repo contains authorization files for the four sandbox datasets. The file with Z0000 in the name is the smallest dataset and should be used for initial experimentation. If you want to use a different dataset then set AUTH_FILE to the corresponding authorization file. If you want to see how authorization files are created, look at make_creds_files.sh
+
 ### Running Stages Individually
 
 1. Set the AUTH_FILE value
@@ -289,46 +293,27 @@ pip3 --version
    *On Mac or Linux:*
 
    ```bash
-   AUTH_FILE=<auth credentials file>
+   AUTH_FILE=credentials_Z0000.base64
    ```
 
    *On Windows from command prompt:*
 
    ```ShellSession
-   SET AUTH_FILE=<auth credentials file>
+   SET AUTH_FILE=credentials_Z0000.base64
    ```
-
-1. Write the credentials to the auth file
-
-   *On Mac or Linux:*
-
-   ```bash
-   echo -n "${OKTA_CLIENT_ID}:${OKTA_CLIENT_PASSWORD}" | base64 > $AUTH_FILE
-   ```
-
-   *On Windows from command prompt:*
-
-   ```ShellSession
-   $BASE64_ENCODED_ID_PASSWORD='{Base64-encoded id:password}'
-   Set-Content -Path $AUTH_FILE $BASE64_ENCODED_ID_PASSWORD
-   ```
-    
-1. Exit your current terminal and open a new terminal
-
-1. Repeat setting the AUTH_FILE value
 
 1. Set a variable with today's date
 
    *Example on Mac or Linux:*
 
    ```bash
-   TODAYS_DATE=2020-10-30
+   TODAYS_DATE=2024-01-31
    ```
 
    *Example on Windows from command prompt:*
 
    ```ShellSession
-   SET TODAYS_DATE=2020-10-30
+   SET TODAYS_DATE=2024-01-31
    ```
 
 1. Create a directory for downloading export files
@@ -352,13 +337,13 @@ pip3 --version
    *On Mac or Linux:*
 
    ```bash
-   python job-cli.py -sandbox --auth $AUTH_FILE --directory $TARGET_DIR --only_start --fhir R4
+   python3 job-cli.py -sandbox --auth $AUTH_FILE --directory $TARGET_DIR --only_start --fhir R4
    ```
 
    *On Windows from command prompt:*
 
    ```ShellSession
-   python job-cli.py -sandbox --auth %AUTH_FILE% --directory %TARGET_DIR% --only_start --fhir R4
+   python3 job-cli.py -sandbox --auth %AUTH_FILE% --directory %TARGET_DIR% --only_start --fhir R4
    ```
 
 1. Verify that a job id was created
@@ -380,13 +365,13 @@ pip3 --version
    *On Mac or Linux:*
 
    ```bash
-   python job-cli.py -sandbox --auth $AUTH --directory $TARGET_DIR --only_monitor
+   python3 job-cli.py -sandbox --auth $AUTH_FILE --directory $TARGET_DIR --only_monitor --fhir R4
    ```
 
    *On Windows from command prompt:*
 
    ```ShellSession
-   python job-cli.py -sandbox --auth %AUTH% --directory %TARGET_DIR% --only_monitor
+   python job-cli.py -sandbox --auth %AUTH_FILE% --directory %TARGET_DIR% --only_monitor --fhir R4
    ```
 
 1. Verify that a job completed by verifying the list of files in the response
@@ -410,13 +395,13 @@ pip3 --version
    *On Mac or Linux:*
 
    ```bash
-   python job-cli.py -sandbox --auth $AUTH --directory $TARGET_DIR --only_download
+   python3 job-cli.py -sandbox --auth $AUTH_FILE --directory $TARGET_DIR --only_download --fhir R4
    ```
 
    *On Windows from command prompt:*
 
    ```ShellSession
-   python job-cli.py -sandbox --auth %AUTH% --directory %TARGET_DIR% --only_download
+   python3 job-cli.py -sandbox --auth %AUTH_FILE% --directory %TARGET_DIR% --only_download
    ```
 
 1. List the files that you have downloaded
@@ -442,13 +427,13 @@ pip3 --version
    *On Mac or Linux:*
 
    ```bash
-   AUTH=<auth value>
+   AUTH_FILE=credentials_Z0000.base64
    ```
 
    *On Windows from command prompt:*
 
    ```ShellSession
-   SET AUTH=<auth value>
+   SET AUTH_FILE=credentials_Z0000.base64
    ```
 
 1. Set a variable with today's date
@@ -486,7 +471,7 @@ pip3 --version
    *On Mac or Linux:*
 
    ```bash
-   python job-cli.py -sandbox --auth $AUTH_FILE --directory $TARGET_DIR --fhir R4
+   python3 job-cli.py -sandbox --auth $AUTH_FILE --directory $TARGET_DIR --fhir R4
    ```
 
    *On Windows from command prompt:*
@@ -510,44 +495,3 @@ pip3 --version
    ```
 
 1. Stop here, you have completed the file download
-
-## Bundling Python and Script
-
-### Build Python in Source
-
-1. Download the latest version of Python as a tar file 
-1. Unpack the tar file `tar -xvf python-tar`
-1. Change directory to the folder created `cd python-tar`
-1. Configure the installer `./configurer --prefix /path/to/ab2d/examples/python/python --with-openssl=$(brew --prefix openssl)`
-1. Run `make`
-1. Run `make install`
-1. Check that the following directories exist in `/path/to/ab2d/examples/python/python`:
-`bin, lib, share, include`
-
-### Setup Virtual Environment
-
-Before zipping up Python we need to create a virtual environment. This part assumes access to IntelliJ or PyCharm.
-
-In IntelliJ these are the steps
-
-1. Go to File -> Project Structure
-1. Look for Platform Settings -> SDKs and click on it
-1. Add a new Python SDK, set the python interpreter as `ab2d/examples/python/python/bin/python3`,
-and set the `venv` home as `examples/python/venv`
-1. Open a terminal in IntelliJ and in that terminal change directories to `ab2d/examples/python/`
-1. Then install the `requests` library by running `venv/bin/pip3 install requests`
-
-### Zip
-
-1. Change directory `cd examples`
-1. `zip -r client.zip python`
-
-### Unzip and Run
-
-**When developing move `/path/to/ab2d/examples/python/python` and `/path/to/ab2d/examples/python/venv` to different
-directories to check that no symbolic links**
-
-1. Unzip `unzip client.zip`
-1. Change directory to the python directory
-1. Export the path to the python folder `PYTHONPATH=./python`
-1. Run a job by using `/venv/bin/python3 job-cli.py ...`
