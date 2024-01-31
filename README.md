@@ -112,7 +112,11 @@ Then run the following command:
 
 ### Install or verify python 3, pip, and required pip modules on Mac
 
-> *** TO DO ***
+Python and pip come pre-installed on MacOS. You can verify this with:
+```ShellSession
+python3 --version
+pip3 --version
+```
 
 ### Install or verify python 3, pip, and required pip modules on Windows
 
