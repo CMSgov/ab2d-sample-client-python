@@ -31,7 +31,7 @@ This script will not overwrite already existing export files.
 
 ```
 Usage: 
-  python job-cli.py (-prod | -sandbox) --auth <authfile.base64> [--directory <dir>] [--since <since>] --fhir (R4 | STU3)
+  python job-cli.py (-prod | -sandbox) --auth <authfile.base64> [--directory <dir>] [--since <since>] [--until <until>] --fhir (R4 | STU3)
         [(--only_start|--only_monitor|--only_download)]
 
 Help (for an explanation of the arguments): 
@@ -49,6 +49,9 @@ Arguments:
   --since         -- if you only want to pull claims data added after a certain date.
                      The expected format is yyyy-MM-dd'T'HH:mm:ss.SSSXXX+/-ZZ:ZZ.
                      Example March 1, 2020 at 3 PM EST -> 2020-03-01T15:00:00.000-05:00. More below.
+  --until         -- if you only want to pull claims data added before a certain date.
+                     The expected format is yyyy-MM-dd'T'HH:mm:ss.SSSXXX+/-ZZ:ZZ.
+                     Example March 1, 2024 at 3 PM EST -> 2024-03-01T15:00:00.000-05:00. More below.
   --fhir          -- FHIR version
 ```
 
@@ -91,6 +94,40 @@ If you want to:
 
 Then run the following command: 
 `python job-cli.py -prod --auth auth-credentials.base64 --directory /opt/foo`
+
+### Until Parameter
+
+If you only want to pull claims data added to the CMS system before a certain date use the `--until` parameter.
+The expected format follows the typical
+ISO date time format of `yyyy-MM-dd'T'HH:mm:ss.SSSXXX+/-ZZ:ZZ`.
+
+For requests using FHIR R4, a default `_until` value is supplied if one is not provided. The value of the default `_until`
+parameter is set to the current date and time.
+
+Examples:
+1. March 1, 2024 at 3 PM EST -> `2024-03-01T15:00:00.000-05:00`
+2. May 31, 2024 at 4 AM PST -> `2024-05-31T04:00:00-08:00`
+
+### Files
+
+1. /directory/jobId.txt -- id of the job created
+2. /directory/response.json -- list of files created
+3. /directory/*.ndjson -- downloaded results of exports
+
+### Limitations
+
+1. Assumes all scripts use the same directory
+2. Assumes all scripts use the same base64 encoded AUTH token
+
+### Example
+
+If you want to:
+1. Start a job running against production
+1. Using base64 encoded credentials stored in `auth-credentials.base64`
+1. And save all results for this job to the directory /opt/foo
+
+Then run the following command:
+`python job-cli.py -prod --auth auth-credentials.base64 --directory /opt/foo --until 2020-03-01T15:00:00.000-05:00`
 
 ## Install or verify python 3, pip, and required pip modules
 
