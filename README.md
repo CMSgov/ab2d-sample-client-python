@@ -87,7 +87,6 @@ Examples:
 
 ### Example
 
-If you want to:
 1. Start a job running against production
 2. Use base64 encoded credentials stored in `auth-credentials.base64`
 3. Save all results for this job to the directory /opt/foo
@@ -121,7 +120,6 @@ Examples:
 
 ### Example
 
-If you want to:
 1. Start a job running against production
 2. Use base64 encoded credentials stored in `auth-credentials.base64`
 3. Save all results for this job to the directory /opt/foo
