@@ -93,7 +93,6 @@ If you want to:
 3. Save all results for this job to the directory /opt/foo
 4. Filter for claims data updated after March 1, 2020 at 3:00 PM Eastern Time by running the following command:
 
-Then run the following command: 
 `python job-cli.py -prod --auth auth-credentials.base64 --directory /opt/foo --since 2020-03-01T15:00:00.000-05:00`
 
 ### Until Parameter
