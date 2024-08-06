@@ -46,10 +46,10 @@ Arguments:
   --only_start    -- if you only want to start a job
   --only_monitor  -- if you only want to monitor an already started a job
   --only_download -- if you only want to download an already finished job
-  --since         -- if you only want to pull claims data added after a certain date.
+  --since         -- if you only want to pull claims data updated or filed after a certain date.
                      The expected format is yyyy-MM-dd'T'HH:mm:ss.SSSXXX+/-ZZ:ZZ.
                      Example March 1, 2020 at 3 PM EST -> 2020-03-01T15:00:00.000-05:00. More below.
-  --until         -- if you only want to pull claims data added before a certain date.
+  --until         -- if you only want to pull claims data updated or filed before a certain date.
                      The expected format is yyyy-MM-dd'T'HH:mm:ss.SSSXXX+/-ZZ:ZZ.
                      Example March 1, 2024 at 3 PM EST -> 2024-03-01T15:00:00.000-05:00. More below.
   --fhir          -- FHIR version
@@ -89,11 +89,12 @@ Examples:
 
 If you want to:
 1. Start a job running against production
-1. Using base64 encoded credentials stored in `auth-credentials.base64`
-1. And save all results for this job to the directory /opt/foo
+2. Use base64 encoded credentials stored in `auth-credentials.base64`
+3. Save all results for this job to the directory /opt/foo
+4. Filter for claims data updated after March 1, 2020 at 3:00 PM Eastern Time by running the following command:
 
 Then run the following command: 
-`python job-cli.py -prod --auth auth-credentials.base64 --directory /opt/foo`
+`python job-cli.py -prod --auth auth-credentials.base64 --directory /opt/foo --since 2020-03-01T15:00:00.000-05:00`
 
 ### Until Parameter
 
@@ -101,8 +102,8 @@ If you only want to pull claims data added to the CMS system before a certain da
 The expected format follows the typical
 ISO date time format of `yyyy-MM-dd'T'HH:mm:ss.SSSXXX+/-ZZ:ZZ`.
 
-For requests using FHIR R4, a default `_until` value is supplied if one is not provided. The value of the default `_until`
-parameter is set to the current date and time.
+This parameter is only available with V2 (FHIR R4). 
+If no `_until` date is specified or you use a date from the future, it will default to the current date and time.
 
 Examples:
 1. March 1, 2024 at 3 PM EST -> `2024-03-01T15:00:00.000-05:00`
@@ -123,11 +124,11 @@ Examples:
 
 If you want to:
 1. Start a job running against production
-1. Using base64 encoded credentials stored in `auth-credentials.base64`
-1. And save all results for this job to the directory /opt/foo
+2. Use base64 encoded credentials stored in `auth-credentials.base64`
+3. Save all results for this job to the directory /opt/foo
+4. Filter for claims data updated before March 1, 2024 at 3:00 PM Eastern Time by running the following command:
 
-Then run the following command:
-`python job-cli.py -prod --auth auth-credentials.base64 --directory /opt/foo --until 2020-03-01T15:00:00.000-05:00`
+`python job-cli.py -prod --auth auth-credentials.base64 --directory /opt/foo --until 2024-03-01T15:00:00.000-05:00`
 
 ## Install or verify python 3, pip, and required pip modules
 
