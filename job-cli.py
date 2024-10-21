@@ -84,7 +84,7 @@ class GetToken(Action):
 
 class StartJob(Action):
 
-    def __init__(self, idp_url, api_url, auth, job_id_file, since=None):
+    def __init__(self, idp_url, api_url, auth, job_id_file, since=None, until=None):
         """
         Start a job in the
         :param job_id_file: location to read job id from
@@ -93,6 +93,7 @@ class StartJob(Action):
         super().__init__(idp_url, api_url, auth)
         self.job_id_file = job_id_file
         self.since = since
+        self.until = until
 
     def start_url(self):
         return "%s/Patient/$export" % self.api_url
@@ -112,6 +113,9 @@ class StartJob(Action):
 
         if self.since is not None:
             params['_since'] = self.since
+
+        if self.until is not None:
+            params['_until'] = self.until
 
         response = requests.get(url, headers={
             "Accept": "application/json",
@@ -271,6 +275,9 @@ def get_env(args):
     if args.fhir != 'STU3' and args.fhir != 'R4':
         raise ValueError("must provide --fhir [R4 | STU3] as an argument")
 
+    if args.fhir == 'STU3' and args.until is not None:
+        raise ValueError("The _until parameter is only available with version 2 (FHIR R4) of the API")
+
     version_url = "v2"
     if args.fhir == "STU3":
         version_url = "v1"
@@ -327,6 +334,10 @@ parser.add_argument("--since", help="receive all EOBs updated or filed after the
                         "The expected format is yyyy-MM-dd'T'HH:mm:ss.SSSXXX. If you want to use a timezone "
                         "see https://docs.oracle.com/en/java/javase/13/docs/api/java.base/java/time/OffsetDateTime.html"
                         " for the expected format.")
+parser.add_argument("--until", help="receive all EOBs updated or filed before the provided date string."
+                                    "The expected format is yyyy-MM-dd'T'HH:mm:ss.SSSXXX. If you want to use a timezone "
+                                    "see https://docs.oracle.com/en/java/javase/13/docs/api/java.base/java/time/OffsetDateTime.html"
+                                    " for the expected format.")
 parser.add_argument("--auth", required=True, help="base64 encoding of okta client id and okta client secret")
 parser.add_argument("--get_token", action="store_true", help="only get a bearer token")
 parser.add_argument("--only_start", action="store_true", help="only start a job don't monitor it")
@@ -352,13 +363,13 @@ try:
     if args.get_token:
         tasks.append(GetToken(idp_url, api_url, auth))
     elif args.only_start:
-        tasks.append(StartJob(idp_url, api_url, auth, job_id_path, args.since))
+        tasks.append(StartJob(idp_url, api_url, auth, job_id_path, args.since, args.until))
     elif args.only_monitor:
         tasks.append(MonitorJob(idp_url, api_url, auth, job_id_path, completion_id_path))
     elif args.only_download:
         tasks.append(DownloadResults(idp_url, api_url, auth, args.directory, completion_id_path))
     else:
-        tasks.append(StartJob(idp_url, api_url, auth, job_id_path, args.since))
+        tasks.append(StartJob(idp_url, api_url, auth, job_id_path, args.since, args.until))
         tasks.append(MonitorJob(idp_url, api_url, auth, job_id_path, completion_id_path))
         tasks.append(DownloadResults(idp_url, api_url, auth, args.directory, completion_id_path))
 
