@@ -78,7 +78,7 @@ Examples:
 
 1. /directory/jobId.txt -- id of the job created
 2. /directory/response.json -- list of files created 
-3. /directory/*.ndjson -- downloaded results of exports 
+3. /directory/*.ndjson or *.ndjson.gz -- downloaded results of exports 
 
 ### Limitations
 
@@ -111,7 +111,7 @@ Examples:
 
 1. /directory/jobId.txt -- id of the job created
 2. /directory/response.json -- list of files created
-3. /directory/*.ndjson -- downloaded results of exports
+3. /directory/*.ndjson or *.ndjson.gz -- downloaded results of exports
 
 ### Limitations
 
@@ -455,13 +455,13 @@ Examples:
    *On Mac or Linux:*
 
    ```bash
-   ls $TARGET_DIR/*.ndjson
+   ls $TARGET_DIR/*.ndjson*
    ```
 
    *On Windows from command prompt:*
 
    ```ShellSession
-   dir %TARGET_DIR%\*.ndjson
+   dir %TARGET_DIR%\*.ndjson*
    ```
 
 1. Stop here, you have completed the file download
@@ -531,13 +531,13 @@ Examples:
    *On Mac or Linux:*
 
    ```bash
-   ls $TARGET_DIR/*.ndjson
+   ls $TARGET_DIR/*.ndjson*
    ```
 
    *On Windows from command prompt:*
 
    ```ShellSession
-   dir %TARGET_DIR%\*.ndjson
+   dir %TARGET_DIR%\*.ndjson*
    ```
 
 1. Stop here, you have completed the file download
