@@ -220,18 +220,20 @@ class DownloadResults(Action):
         token = self.get_or_refresh_token()
         local_filename = url.split('/')[-1]
         local_path = self.directory + os.sep + local_filename
+        accept_encoding = 'identity'
 
         if not os.path.exists(local_path):
             print("Downloading %s to %s" % (local_filename, self.directory))
 
-            headers={
-                "Accept": "application/fhir+ndjson",
-                "Authorization": "Bearer %s" % token['access_token']
-            }
-
             if (self.gzip):
                 local_filename = local_filename + '.gz'
-                headers['Accept-Encoding'] = 'gzip'
+                accept_encoding = 'gzip'
+
+            headers={
+                "Accept": "application/fhir+ndjson",
+                "Accept-Encoding": accept_encoding,
+                "Authorization": "Bearer %s" % token['access_token']
+            }
 
             # NOTE the stream=True parameter below
             with requests.get(url, headers, stream=True) as r:
