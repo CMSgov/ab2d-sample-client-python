@@ -434,7 +434,7 @@ Examples:
    type %TARGET_DIR%\response.json
    ```
 
-1. Download the files
+1. Download the files. You can speed up download times by requesting compressed files in gzip format with the optional `Accept-Encoding: gzip` header in your command. Afterward, decompress (unzip) the gzip files into NDJSON format.
 
    *Note that this process will only download the files once. Running again will not overwrite the files but will also not download anything.*
 
