@@ -204,43 +204,32 @@ class MonitorJob(Action):
 
 class DownloadResults(Action):
 
-    def __init__(self, idp_url, api_url, auth, directory, response_path, gzip):
+    def __init__(self, idp_url, api_url, auth, directory, response_path):
         """
         :param response_path: location to read list of files to import from job
         :type response_path: file
-        :type gzip: if true, download compressed file in gzip format
         """
         super().__init__(idp_url, api_url, auth)
         self.directory = directory
         self.response_path = response_path
-        self.gzip = gzip
 
     # Based on https://stackoverflow.com/questions/16694907/download-large-file-in-python-with-requests
     def download(self, url):
 
         token = self.get_or_refresh_token()
-        accept_encoding = 'identity'
-
         local_filename = url.split('/')[-1]
-        if (self.gzip):
-            local_filename = local_filename + '.gz'
-            accept_encoding = 'gzip'
-
         local_path = self.directory + os.sep + local_filename
-
 
         if not os.path.exists(local_path):
             print("Downloading %s to %s" % (local_filename, self.directory))
 
-
-            headers={
-                "Accept": "application/fhir+ndjson",
-                "Accept-Encoding": accept_encoding,
-                "Authorization": "Bearer %s" % token['access_token']
-            }
-
             # NOTE the stream=True parameter below
-            with requests.get(url, headers, stream=True) as r:
+            # NOTE the 'requests' library automatically decodes gzip content and writes ndjson to file
+            with requests.get(url, headers={
+                "Accept": "application/fhir+ndjson",
+                "Accept-Encoding": "gzip",
+                "Authorization": "Bearer %s" % token['access_token']
+            }, stream=True) as r:
 
                 # Raise error on failure of the call
                 r.raise_for_status()
@@ -279,13 +268,11 @@ def get_env(args):
     :rtype: (str, str)
     """
 
-# TODO uncomment below - only for testing locally with IMPL environment
+    if args.prod and args.sandbox:
+        raise ValueError("must choose either -prod or -sandbox as an argument")
 
-#     if args.prod and args.sandbox:
-#         raise ValueError("must choose either -prod or -sandbox as an argument")
-#
-#     if not args.prod and not args.sandbox:
-#         raise ValueError("must provide -prod or -sandbox as an argument")
+    if not args.prod and not args.sandbox:
+        raise ValueError("must provide -prod or -sandbox as an argument")
 
     if args.fhir != 'STU3' and args.fhir != 'R4':
         raise ValueError("must provide --fhir [R4 | STU3] as an argument")
@@ -300,9 +287,6 @@ def get_env(args):
     if args.sandbox:
         return ("https://test.idp.idm.cms.gov/oauth2/aus2r7y3gdaFMKBol297/v1/token",
                 "https://sandbox.ab2d.cms.gov/api/" + version_url + "/fhir")
-    elif args.impl:
-        return ("https://test.idp.idm.cms.gov/oauth2/aus2r7y3gdaFMKBol297/v1/token",
-                "https://impl.ab2d.cms.gov/api/" + version_url + "/fhir")
     else:
         return ("https://idm.cms.gov/oauth2/aus2ytanytjdaF9cr297/v1/token",
                 "https://api.ab2d.cms.gov/api/" + version_url + "/fhir")
@@ -345,15 +329,13 @@ def resolve_auth(args):
 parser = argparse.ArgumentParser()
 parser.add_argument("-prod", action="store_true", help="run a job against the AB2D production environment")
 parser.add_argument("-sandbox", action="store_true", help="run a job against the AB2D sandbox environment")
-parser.add_argument("-impl", action="store_true", help="run a job against the AB2D IMPL environment")
 parser.add_argument("--directory", default="." + os.sep,
                     help="set the directory to save results to, defaults to current directory")
-parser.add_argument("--gzip", action="store_true", help="download file in gzip format", default=False)
 parser.add_argument("--since", help="receive all EOBs updated or filed after the provided date string."
-                        " The earliest date accepted is 2020-02-13T00:00:00.000-05:00. "
-                        "The expected format is yyyy-MM-dd'T'HH:mm:ss.SSSXXX. If you want to use a timezone "
-                        "see https://docs.oracle.com/en/java/javase/13/docs/api/java.base/java/time/OffsetDateTime.html"
-                        " for the expected format.")
+                                    " The earliest date accepted is 2020-02-13T00:00:00.000-05:00. "
+                                    "The expected format is yyyy-MM-dd'T'HH:mm:ss.SSSXXX. If you want to use a timezone "
+                                    "see https://docs.oracle.com/en/java/javase/13/docs/api/java.base/java/time/OffsetDateTime.html"
+                                    " for the expected format.")
 parser.add_argument("--until", help="receive all EOBs updated or filed before the provided date string."
                                     "The expected format is yyyy-MM-dd'T'HH:mm:ss.SSSXXX. If you want to use a timezone "
                                     "see https://docs.oracle.com/en/java/javase/13/docs/api/java.base/java/time/OffsetDateTime.html"
@@ -387,11 +369,11 @@ try:
     elif args.only_monitor:
         tasks.append(MonitorJob(idp_url, api_url, auth, job_id_path, completion_id_path))
     elif args.only_download:
-        tasks.append(DownloadResults(idp_url, api_url, auth, args.directory, completion_id_path, args.gzip))
+        tasks.append(DownloadResults(idp_url, api_url, auth, args.directory, completion_id_path))
     else:
         tasks.append(StartJob(idp_url, api_url, auth, job_id_path, args.since, args.until))
         tasks.append(MonitorJob(idp_url, api_url, auth, job_id_path, completion_id_path))
-        tasks.append(DownloadResults(idp_url, api_url, auth, args.directory, completion_id_path, args.gzip))
+        tasks.append(DownloadResults(idp_url, api_url, auth, args.directory, completion_id_path))
 
     for task in tasks:
         task()
