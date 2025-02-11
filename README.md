@@ -78,7 +78,7 @@ Examples:
 
 1. /directory/jobId.txt -- id of the job created
 2. /directory/response.json -- list of files created 
-3. /directory/*.ndjson or *.ndjson.gz -- downloaded results of exports 
+3. /directory/*.ndjson -- downloaded results of exports 
 
 ### Limitations
 
@@ -111,7 +111,7 @@ Examples:
 
 1. /directory/jobId.txt -- id of the job created
 2. /directory/response.json -- list of files created
-3. /directory/*.ndjson or *.ndjson.gz -- downloaded results of exports
+3. /directory/*.ndjson -- downloaded results of exports
 
 ### Limitations
 
@@ -434,7 +434,7 @@ Examples:
    type %TARGET_DIR%\response.json
    ```
 
-1. Download the files. You can speed up download times by requesting compressed files in gzip format with the optional `Accept-Encoding: gzip` header in your command. Afterward, decompress (unzip) the gzip files into NDJSON format.
+1. Download the files
 
    *Note that this process will only download the files once. Running again will not overwrite the files but will also not download anything.*
 
@@ -455,13 +455,13 @@ Examples:
    *On Mac or Linux:*
 
    ```bash
-   ls $TARGET_DIR/*.ndjson*
+   ls $TARGET_DIR/*.ndjson
    ```
 
    *On Windows from command prompt:*
 
    ```ShellSession
-   dir %TARGET_DIR%\*.ndjson*
+   dir %TARGET_DIR%\*.ndjson
    ```
 
 1. Stop here, you have completed the file download
@@ -531,13 +531,13 @@ Examples:
    *On Mac or Linux:*
 
    ```bash
-   ls $TARGET_DIR/*.ndjson*
+   ls $TARGET_DIR/*.ndjson
    ```
 
    *On Windows from command prompt:*
 
    ```ShellSession
-   dir %TARGET_DIR%\*.ndjson*
+   dir %TARGET_DIR%\*.ndjson
    ```
 
 1. Stop here, you have completed the file download
