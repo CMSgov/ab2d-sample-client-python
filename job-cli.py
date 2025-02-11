@@ -219,16 +219,19 @@ class DownloadResults(Action):
     def download(self, url):
 
         token = self.get_or_refresh_token()
-        local_filename = url.split('/')[-1]
-        local_path = self.directory + os.sep + local_filename
         accept_encoding = 'identity'
+
+        local_filename = url.split('/')[-1]
+        if (self.gzip):
+            local_filename = local_filename + '.gz'
+            accept_encoding = 'gzip'
+
+        local_path = self.directory + os.sep + local_filename
+
 
         if not os.path.exists(local_path):
             print("Downloading %s to %s" % (local_filename, self.directory))
 
-            if (self.gzip):
-                local_filename = local_filename + '.gz'
-                accept_encoding = 'gzip'
 
             headers={
                 "Accept": "application/fhir+ndjson",
