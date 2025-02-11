@@ -213,6 +213,7 @@ class DownloadResults(Action):
         super().__init__(idp_url, api_url, auth)
         self.directory = directory
         self.response_path = response_path
+        self.gzip = gzip
 
     # Based on https://stackoverflow.com/questions/16694907/download-large-file-in-python-with-requests
     def download(self, url):
