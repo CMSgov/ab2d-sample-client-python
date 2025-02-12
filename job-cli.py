@@ -224,8 +224,10 @@ class DownloadResults(Action):
             print("Downloading %s to %s" % (local_filename, self.directory))
 
             # NOTE the stream=True parameter below
+            # NOTE the 'requests' library automatically decodes gzip content and writes ndjson to file
             with requests.get(url, headers={
                 "Accept": "application/fhir+ndjson",
+                "Accept-Encoding": "gzip",
                 "Authorization": "Bearer %s" % token['access_token']
             }, stream=True) as r:
 
@@ -330,10 +332,10 @@ parser.add_argument("-sandbox", action="store_true", help="run a job against the
 parser.add_argument("--directory", default="." + os.sep,
                     help="set the directory to save results to, defaults to current directory")
 parser.add_argument("--since", help="receive all EOBs updated or filed after the provided date string."
-                        " The earliest date accepted is 2020-02-13T00:00:00.000-05:00. "
-                        "The expected format is yyyy-MM-dd'T'HH:mm:ss.SSSXXX. If you want to use a timezone "
-                        "see https://docs.oracle.com/en/java/javase/13/docs/api/java.base/java/time/OffsetDateTime.html"
-                        " for the expected format.")
+                                    " The earliest date accepted is 2020-02-13T00:00:00.000-05:00. "
+                                    "The expected format is yyyy-MM-dd'T'HH:mm:ss.SSSXXX. If you want to use a timezone "
+                                    "see https://docs.oracle.com/en/java/javase/13/docs/api/java.base/java/time/OffsetDateTime.html"
+                                    " for the expected format.")
 parser.add_argument("--until", help="receive all EOBs updated or filed before the provided date string."
                                     "The expected format is yyyy-MM-dd'T'HH:mm:ss.SSSXXX. If you want to use a timezone "
                                     "see https://docs.oracle.com/en/java/javase/13/docs/api/java.base/java/time/OffsetDateTime.html"
