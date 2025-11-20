@@ -7,8 +7,8 @@ This may be a great starting point for your engineering or development teams how
 Use of these clients in the sandbox environment allows for safe testing and ensures no PII/PHI will not be compromised 
 if a mistake is made. The sandbox environment is publicly available and all the data in it is synthetic (**not** real)
 
-AB2D supports both R4 and STU3 versions of the FHIR standard. FHIR R4 is available using v2 of AB2D while FHIR STU3 
-can be accessed via AB2D v1. Accordingly, this client supports both R4/ v2 and STU3/ v1.
+AB2D supports both R4 and STU3 versions of the FHIR standard. FHIR R4 is available using v2 and v3 of AB2D while FHIR STU3 
+can be accessed via AB2D v1. Accordingly, this client supports R4/v2, R4/v3 and STU3/v1.
 
 ## Production Use Disclaimer:
 
@@ -24,7 +24,7 @@ Python `requests` module must be installed
 
 A simple client for starting a job in sandbox or production, monitor that job,
 and download the results. To prevent issues these scripts persist the job
-id and list of files generated. This client supports both FHIR version R4 (v2) and STU3 (v1) of 
+id and list of files generated. This client supports FHIR version R4 (v2, v3) and STU3 (v1) of 
 the standard.
 
 This script will not overwrite already existing export files.
@@ -32,7 +32,7 @@ This script will not overwrite already existing export files.
 ```
 Usage: 
   python job-cli.py (-prod | -sandbox) --auth <authfile.base64> [--directory <dir>] [--since <since>] [--until <until>] --fhir (R4 | STU3)
-        [(--only_start|--only_monitor|--only_download)]
+        [(--only_start|--only_monitor|--only_download)] [--ab2d-endpoint (v2 | v3)]
 
 Help (for an explanation of the arguments): 
    python job-cli.py --help
@@ -53,6 +53,7 @@ Arguments:
                      The expected format is yyyy-MM-dd'T'HH:mm:ss.SSSXXX+/-ZZ:ZZ.
                      Example March 1, 2024 at 3 PM EST -> 2024-03-01T15:00:00.000-05:00. More below.
   --fhir          -- FHIR version
+  --ab2d-endpoint -- AB2D API endpoint version when using FHIR R4 (v2 | v3). Defaults to v2 if not specified.
 ```
 
 ### Help
