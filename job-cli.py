@@ -280,8 +280,17 @@ def get_env(args):
     if args.fhir == 'STU3' and args.until is not None:
         raise ValueError("The _until parameter is only available with version 2 (FHIR R4) of the API")
 
-    version_url = "v2"
-    if args.fhir == "STU3":
+    if args.fhir == 'STU3' and args.ab2d_endpoint is not None:
+        raise ValueError("The --ab2d-endpoint parameter is only available with FHIR R4")
+
+    if args.fhir == 'R4':
+        if args.ab2d_endpoint is None:
+            version_url = "v2"
+        else:
+            if args.ab2d_endpoint not in ("v2", "v3"):
+                raise ValueError("When using FHIR R4, --ab2d-endpoint must be one of: v2 or v3")
+            version_url = args.ab2d_endpoint
+    else:
         version_url = "v1"
 
     if args.sandbox:
@@ -348,6 +357,8 @@ parser.add_argument("--only_monitor", action="store_true", help="only monitor an
 parser.add_argument("--only_download", action="store_true", help="only download results from an already finished job"
                                                                  "do not start or monitor")
 parser.add_argument("--fhir", required=True, help="choose FHIR version (R4 or STU3)")
+parser.add_argument("--ab2d-endpoint", dest="ab2d_endpoint",
+                    help="AB2D API endpoint version when using FHIR R4 (v2 or v3). Defaults to v2 if not specified.")
 args = parser.parse_args()
 
 try:
