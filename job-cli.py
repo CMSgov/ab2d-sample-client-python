@@ -84,7 +84,7 @@ class GetToken(Action):
 
 class StartJob(Action):
 
-    def __init__(self, idp_url, api_url, auth, job_id_file, since=None, until=None):
+    def __init__(self, idp_url, api_url, auth, job_id_file, since=None, until=None, service_dates=None):
         """
         Start a job in the
         :param job_id_file: location to read job id from
@@ -94,6 +94,7 @@ class StartJob(Action):
         self.job_id_file = job_id_file
         self.since = since
         self.until = until
+        self.service_dates = service_dates
 
     def start_url(self):
         return "%s/Patient/$export" % self.api_url
@@ -116,6 +117,10 @@ class StartJob(Action):
 
         if self.until is not None:
             params['_until'] = self.until
+
+        if self.service_dates:
+            params['_typeFilter'] = "ExplanationOfBenefit?" + "&".join(
+                "service-date=%s" % service_date for service_date in self.service_dates)
 
         response = requests.get(url, headers={
             "Accept": "application/json",
@@ -293,12 +298,30 @@ def get_env(args):
     else:
         version_url = "v1"
 
+    if args.service_date is not None and version_url != "v3":
+        raise ValueError("The --service-date parameter is only available with --fhir R4 --ab2d-endpoint v3")
+
     if args.sandbox:
         return ("https://test.idp.idm.cms.gov/oauth2/aus2r7y3gdaFMKBol297/v1/token",
                 "https://sandbox.ab2d.cms.gov/api/" + version_url + "/fhir")
     else:
         return ("https://idm.cms.gov/oauth2/aus2ytanytjdaF9cr297/v1/token",
                 "https://api.ab2d.cms.gov/api/" + version_url + "/fhir")
+
+
+def resolve_service_dates(args):
+    """
+    Split a comma separated service-date argument into individual FHIR date params
+    :param args: list of arguments provided on command line
+    :type args: argparse.Namespace
+    :return: list of FHIR date params, e.g. ['gt2026-01-01', 'lt2026-02-01']
+    :rtype: list
+    """
+
+    if args.service_date is None:
+        return None
+
+    return [service_date.strip() for service_date in args.service_date.split(",") if service_date.strip()]
 
 
 def resolve_auth(args):
@@ -341,7 +364,8 @@ parser.add_argument("-sandbox", action="store_true", help="run a job against the
 parser.add_argument("--directory", default="." + os.sep,
                     help="set the directory to save results to, defaults to current directory")
 parser.add_argument("--since", help="receive all EOBs updated or filed after the provided date string."
-                                    " The earliest date accepted is 2020-02-13T00:00:00.000-05:00. "
+                                    " The earliest date accepted is 2020-02-13T00:00:00.000-05:00 for v1/v2"
+                                    " and 2026-04-01T00:00:00.000-05:00 for v3. "
                                     "The expected format is yyyy-MM-dd'T'HH:mm:ss.SSSXXX. If you want to use a timezone "
                                     "see https://docs.oracle.com/en/java/javase/13/docs/api/java.base/java/time/OffsetDateTime.html"
                                     " for the expected format.")
@@ -359,6 +383,10 @@ parser.add_argument("--only_download", action="store_true", help="only download 
 parser.add_argument("--fhir", required=True, help="choose FHIR version (R4 or STU3)")
 parser.add_argument("--ab2d-endpoint", dest="ab2d_endpoint",
                     help="AB2D API endpoint version when using FHIR R4 (v2 or v3). Defaults to v2 if not specified.")
+parser.add_argument("--service-date", dest="service_date",
+                    help="only receive EOBs with a service date matching the provided FHIR date params."
+                         " Only available with v3. Separate multiple params with a comma."
+                         " Examples: gt2026-01-01 or gt2026-01-01,lt2026-02-01")
 args = parser.parse_args()
 
 try:
@@ -370,19 +398,20 @@ try:
     job_id_path = "%s%c%s" % (args.directory, os.sep, "job_id.txt")
     completion_id_path = "%s%c%s" % (args.directory, os.sep, "response.json")
     auth = resolve_auth(args)
+    service_dates = resolve_service_dates(args)
     # since = resolve_since(args)
 
     tasks = list()
     if args.get_token:
         tasks.append(GetToken(idp_url, api_url, auth))
     elif args.only_start:
-        tasks.append(StartJob(idp_url, api_url, auth, job_id_path, args.since, args.until))
+        tasks.append(StartJob(idp_url, api_url, auth, job_id_path, args.since, args.until, service_dates))
     elif args.only_monitor:
         tasks.append(MonitorJob(idp_url, api_url, auth, job_id_path, completion_id_path))
     elif args.only_download:
         tasks.append(DownloadResults(idp_url, api_url, auth, args.directory, completion_id_path))
     else:
-        tasks.append(StartJob(idp_url, api_url, auth, job_id_path, args.since, args.until))
+        tasks.append(StartJob(idp_url, api_url, auth, job_id_path, args.since, args.until, service_dates))
         tasks.append(MonitorJob(idp_url, api_url, auth, job_id_path, completion_id_path))
         tasks.append(DownloadResults(idp_url, api_url, auth, args.directory, completion_id_path))
 
