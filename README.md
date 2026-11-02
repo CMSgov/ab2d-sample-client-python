@@ -49,7 +49,7 @@ Arguments:
   --since         -- if you only want to pull claims data updated or filed after a certain date.
                      The expected format is yyyy-MM-dd'T'HH:mm:ss.SSSXXX+/-ZZ:ZZ.
                      Example March 1, 2020 at 3 PM EST -> 2020-03-01T15:00:00.000-05:00. More below.
-                     For v3 the earliest accepted date is 2026-04-01T00:00:00.000-05:00.
+                     For v3 the earliest accepted date is 2026-03-26T00:00:00.000-05:00.
   --until         -- if you only want to pull claims data updated or filed before a certain date.
                      The expected format is yyyy-MM-dd'T'HH:mm:ss.SSSXXX+/-ZZ:ZZ.
                      Example March 1, 2024 at 3 PM EST -> 2024-03-01T15:00:00.000-05:00. More below.
@@ -72,7 +72,7 @@ ISO date time format of `yyyy-MM-dd'T'HH:mm:ss.SSSXXX+/-ZZ:ZZ`.
 
 The earliest date that `_since` works for is February 13th, 2020. Specifically: `2020-02-13T00:00:00.000-05:00`
 
-For V3 (R4V3), the earliest accepted date is April 1st, 2026. Specifically: `2026-04-01T00:00:00.000-05:00`
+For V3 (R4V3), the earliest accepted date is March 26, 2026. Specifically: `2026-03-26T00:00:00.000-05:00`
 
 For requests using FHIR R4, a default `_since` value is supplied if one is not provided. The value of the default `_since` 
 parameter is set to the creation date and time of a contract's last successfully searched and downloaded job.
